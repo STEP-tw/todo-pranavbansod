@@ -1,9 +1,11 @@
-let fs = require('fs');
+const fs = require('fs');
 const timeStamp = require('./time.js').timeStamp;
 const WebApp = require('./webapp');
-let registered_users = [{userName:'prateikp'}, {userName:'pranavb'}];
-
+const registered_users = [{userName:'prateikp'}, {userName:'pranavb'}];
+const dataPath = './data/data.json';
+let data = JSON.parse(fs.readFileSync(dataPath,'utf-8')||{})
 let app = WebApp.create();
+let ToDo = require('./lib/toDo.js');
 
 const getContentType = function(filename) {
   let extension = filename.slice(filename.lastIndexOf('.'));
@@ -42,25 +44,21 @@ let loadUser = (req,res)=>{
 
 let redirectLoggedInUserToHome = (req,res)=>{
   if(req.urlIsOneOf(['/','/login.html']) && req.user) {
-    res.statusCode = 302;
-    res.setHeader('location','/homePage.html');
-    res.end();
+    res.redirect('/homePage.html');
   }
-};
+}
 
 let redirectLoggedOutUserToLogin = (req,res)=>{
-  let urlAllowedForOnlyLoggedInUsers = ['/', '/homePage.html', '/logout', '/toDo.html', '/item.html'];
-  if(req.urlIsOneOf(urlAllowedForOnlyLoggedInUsers) && !req.user) {
-    res.statusCode = 302;
-    res.setHeader('location','/login.html');
-    res.end();
+  let urlAllowedForOnlyLoggedIn = ['/', '/homePage.html', '/logout.html', '/toDo.html', '/item.html']
+  if(req.urlIsOneOf(urlAllowedForOnlyLoggedIn) && !req.user) {
+    res.redirect('/login.html');
   }
-};
+}
 
-app.addPreProcessor(redirectLoggedInUserToHome);
-app.addPreProcessor(redirectLoggedOutUserToLogin);
 app.addPreProcessor(logRequest);
 app.addPreProcessor(loadUser);
+app.addPreProcessor(redirectLoggedInUserToHome);
+app.addPreProcessor(redirectLoggedOutUserToLogin);
 
 
 // ======================================================================
@@ -70,16 +68,54 @@ app.post('/login.html',(req,res)=>{
   res.setHeader('Set-Cookie',`logInFailed=false`);
   if(!user) {
     res.setHeader('Set-Cookie',`logInFailed=true`);
-    res.redirect('/login.html');
+    res.setHeader('location','/login.html');
     return;
   }
   let sessionid = new Date().getTime();
   res.setHeader('Set-Cookie',`sessionid=${sessionid}`);
   user.sessionid = sessionid;
-  res.setHeader('location','/homePage.html');
+  redirectToHomePage(req,res);
+});
+
+app.get('/logout',(req,res)=>{
+  res.setHeader('Set-Cookie',['logInFailed=false',`Expires=${new Date(1).toUTCString()}`,`sessionid=0`]);
+  delete req.user.sessionid;
+  res.redirect('/login.html');
   res.end()
 });
 
+app.post('/homePage.html',(req,res)=>{
+  let toDoTitle = req.body['toDoTitle'];
+  let description = req.body['description'];
+  let currUserName = req.user.userName;
+  let userData = {};
+  userData['name'] = currUserName;
+  userData['allToDo'] = {};
+  let allToDo = userData['allToDo'];
+  allToDo[`${toDoTitle}`] = new ToDo(toDoTitle,description);
+  data[`${currUserName}`] = userData;
+  let dataInString = JSON.stringify(data);
+  fs.writeFileSync(dataPath,dataInString,'utf8');
+  res.statusCode = 302;
+  res.setHeader('location','/homePage.html');
+  res.end();
+})
+
+const getDataForCurrentUser = function() {
+  let currUserName = req.user.userName;
+  return data[`${currUserName}`];
+}
+
+const getToDoTitlesForCurrUser = function() {
+  let currUserData = getDataForCurrentUser();
+  let allToDoTitles = Object.keys(currUserData['allToDo']);
+  return allToDoTitles;
+}
+
+// app.get('/homePage.html',(req,res)=>{
+//   let toDoTitles = getToDoTitlesForCurrUser();
+//
+// })
 
 // ======================================================================
 

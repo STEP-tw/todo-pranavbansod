@@ -1,9 +1,9 @@
 let chai = require('chai');
 let assert = chai.assert;
-let request = require('./requestSimulator.js');
+let request = require('../testDep/requestSimulator.js');
 process.env.COMMENT_STORE = "./testStore.json";
 let app = require('../app.js');
-let th = require('./testHelper.js');
+let th = require('../testDep/testHelper.js');
 
 describe('app without Login',()=>{
   describe('GET /bad',()=>{
@@ -55,7 +55,7 @@ describe('app without Login',()=>{
     })
   })
 
-  describe('GET /item.html',()=>{
+  describe('GET /login.html',()=>{
     it('serves login.html',done=>{
       request(app,{method:'GET',url:'/login.html'},res=>{
         th.status_is_ok(res);

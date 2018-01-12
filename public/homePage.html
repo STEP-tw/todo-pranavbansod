@@ -5,16 +5,18 @@
     <title>TO DO App</title>
   </head>
   <body>
+    <script type="text/javascript" src="/js/dataToBeSent.js"></script>
+    <script type="text/javascript" src="/js/homePage.js"></script>
     <h1>To Do App</h1>
     <userName></userName>
     <h1>ToDo Lists</h1>
     <div id="todoLists">
 
     </div>
-    <form method="post">
-      Title : <input type="text" name="toDoTitle" value="">
+    <form action="homePage.html" method="post">
+      Title : <input type="text" name="toDoTitle" value="" required>
       Description : <input type="text" name="description" value="">
-      <input type="submit" name="" value="">Add ToDo</input>
+      <input type="submit" name="" value="Add ToDo"></input>
     </form>
   </body>
 </html>
