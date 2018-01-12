@@ -1,3 +1,4 @@
 node_modules/
+testFrameWork/
 *.log
 .DS_Store
