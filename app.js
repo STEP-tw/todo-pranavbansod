@@ -3,6 +3,7 @@ const timeStamp = require('./time.js').timeStamp;
 const WebApp = require('./webapp');
 const registered_users = [{userName:'prateikp'}, {userName:'pranavb'}];
 const dataPath = './data/data.json';
+const dataToBeSentPath = './public/js/dataToBeSent.js'
 let data = JSON.parse(fs.readFileSync(dataPath,'utf-8')||{})
 let app = WebApp.create();
 let ToDo = require('./lib/toDo.js');
@@ -95,6 +96,8 @@ app.post('/homePage.html',(req,res)=>{
   allToDo[`${toDoTitle}`] = new ToDo(toDoTitle,description);
   data[`${currUserName}`] = userData;
   let dataInString = JSON.stringify(data);
+  let dataToBeSent = 'let data = ' + dataInString;
+  fs.writeFileSync(dataToBeSentPath,dataToBeSent,'utf8');
   fs.writeFileSync(dataPath,dataInString,'utf8');
   res.statusCode = 302;
   res.setHeader('location','/homePage.html');
@@ -112,10 +115,12 @@ const getToDoTitlesForCurrUser = function() {
   return allToDoTitles;
 }
 
-// app.get('/homePage.html',(req,res)=>{
-//   let toDoTitles = getToDoTitlesForCurrUser();
-//
-// })
+app.get('/homePage.html',(req,res)=>{
+  let homePage = fs.readFileSync('./public/homePage.html','utf8');
+  homePage = homePage.replace('<userName></userName>',req.user.userName);
+  res.write(homePage);
+  res.end();
+})
 
 // ======================================================================
 
