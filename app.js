@@ -99,9 +99,7 @@ app.post('/homePage.html',(req,res)=>{
   let dataToBeSent = 'let data = ' + dataInString;
   fs.writeFileSync(dataToBeSentPath,dataToBeSent,'utf8');
   fs.writeFileSync(dataPath,dataInString,'utf8');
-  res.statusCode = 302;
-  res.setHeader('location','/homePage.html');
-  res.end();
+  redirectToHomePage(req,res);
 })
 
 const getDataForCurrentUser = function() {
