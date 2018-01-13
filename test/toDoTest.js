@@ -21,15 +21,15 @@ describe('ToDo Module',()=>{
   describe('getDescription',()=>{
       it('should return description of ToDo',()=>{
         let todo = new ToDo('MyToDo','desc');
-        assert.equal(todo.getDescription(),'desc');
+        assert.equal(todo.getDesc(),'desc');
       })
   })
 
   describe('editDescription',()=>{
     it('should edit description of ToDo',()=>{
       let todo = new ToDo('My Description');
-      todo.editDescription('New Description');
-      assert.equal(todo.getDescription(),'New Description');
+      todo.editDesc('New Description');
+      assert.equal(todo.getDesc(),'New Description');
     })
   })
 
@@ -73,6 +73,42 @@ describe('ToDo Module',()=>{
       todo.addItem('Item 1');
       todo.addItem('Item 2');
       assert.deepEqual(todo.getItemsDescInList(),['Item 1','Item 2'])
+    })
+  })
+
+  describe('editDescOfItem',()=>{
+    it('should edit description of given item by new desc',()=>{
+      let todo = new ToDo('My ToDo');
+      let item1 = new ToDoItem('Item 1')
+      todo.addItem('Item 1');
+      let newItem = new ToDoItem('New Item');
+      todo.editDescOfItem('Item 1','New Item');
+      let allItems = {'New Item':newItem};
+      assert.deepEqual(todo.getItems(),allItems);
+    })
+  })
+
+  describe('checkItem',()=>{
+    it('should set checkedValue of given item to true',()=>{
+      let todo = new ToDo('My ToDo');
+      todo.addItem('Item 1');
+      todo.checkItem('Item 1');
+      let item1 = new ToDoItem('Item 1')
+      item1.check();
+      let allItems = {'Item 1':item1};
+      assert.deepEqual(todo.getItems(),allItems)
+    })
+  })
+
+  describe('uncheckItem',()=>{
+    it('should set checkedValue of given item to true',()=>{
+      let todo = new ToDo('My ToDo');
+      todo.addItem('Item 1');
+      todo.uncheckItem('Item 1');
+      let item1 = new ToDoItem('Item 1')
+      item1.uncheck();
+      let allItems = {'Item 1':item1};
+      assert.deepEqual(todo.getItems(),allItems)
     })
   })
 })

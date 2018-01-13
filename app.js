@@ -3,10 +3,19 @@ const timeStamp = require('./time.js').timeStamp;
 const WebApp = require('./webapp');
 const registered_users = [{userName:'prateikp'}, {userName:'pranavb'}];
 const dataPath = './data/data.json';
-const dataToBeSentPath = './public/js/dataToBeSent.js'
-let data = JSON.parse(fs.readFileSync(dataPath,'utf-8')||{})
+const dataToBeSentPath = './public/js/dataToBeSent.js';
+let data = {};
+
+let User = require('./lib/user.js');
+let pranavb = new User('pranavb');
+let pratikp = new User('pratikp');
+data['pranavb'] = pranavb;
+data['pratikp'] = pratikp;
 let app = WebApp.create();
 let ToDo = require('./lib/toDo.js');
+
+
+
 
 const getContentType = function(filename) {
   let extension = filename.slice(filename.lastIndexOf('.'));
@@ -88,13 +97,9 @@ app.get('/logout',(req,res)=>{
 app.post('/homePage.html',(req,res)=>{
   let toDoTitle = req.body['toDoTitle'];
   let description = req.body['description'];
-  let currUserName = req.user.userName;
-  let userData = {};
-  userData['name'] = currUserName;
-  userData['allToDo'] = {};
-  let allToDo = userData['allToDo'];
-  allToDo[`${toDoTitle}`] = new ToDo(toDoTitle,description);
-  data[`${currUserName}`] = userData;
+  let userName = req.user.userName;
+  let user = data[`${userName}`];
+  user.addToDo(toDoTitle,description);
   let dataInString = JSON.stringify(data);
   let dataToBeSent = 'let data = ' + dataInString;
   fs.writeFileSync(dataToBeSentPath,dataToBeSent,'utf8');
