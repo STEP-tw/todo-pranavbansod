@@ -56,14 +56,14 @@ let redirectLoggedInUserToHome = (req,res)=>{
   if(req.urlIsOneOf(['/','/login.html']) && req.user) {
     res.redirect('/homePage.html');
   }
-}
+};
 
 let redirectLoggedOutUserToLogin = (req,res)=>{
   let urlAllowedForOnlyLoggedIn = ['/', '/homePage.html', '/logout.html', '/toDo.html', '/item.html']
   if(req.urlIsOneOf(urlAllowedForOnlyLoggedIn) && !req.user) {
     res.redirect('/login.html');
   }
-}
+};
 
 app.addPreProcessor(logRequest);
 app.addPreProcessor(loadUser);
@@ -105,25 +105,21 @@ app.post('/homePage.html',(req,res)=>{
   fs.writeFileSync(dataToBeSentPath,dataToBeSent,'utf8');
   fs.writeFileSync(dataPath,dataInString,'utf8');
   redirectToHomePage(req,res);
+});
+
+app.get('/toDo.html',(req,res)=>{
+  let toDo = fs.readFileSync('./public/toDo.html','utf-8');
+  toDo = toDo.replace('<toDoTitle></toDoTitle>',req.cookies.currentToDo);
+  res.write(toDo);
+  res.end();
 })
-
-const getDataForCurrentUser = function() {
-  let currUserName = req.user.userName;
-  return data[`${currUserName}`];
-}
-
-const getToDoTitlesForCurrUser = function() {
-  let currUserData = getDataForCurrentUser();
-  let allToDoTitles = Object.keys(currUserData['allToDo']);
-  return allToDoTitles;
-}
 
 app.get('/homePage.html',(req,res)=>{
   let homePage = fs.readFileSync('./public/homePage.html','utf8');
   homePage = homePage.replace('<userName></userName>',req.user.userName);
   res.write(homePage);
   res.end();
-})
+});
 
 // ======================================================================
 
@@ -132,18 +128,24 @@ const processForFileFound = function(req,res,filename) {
   res.setHeader('Content-Type',contentType);
   res.statusCode = 200;
   res.write(fs.readFileSync(filename))
-}
+};
 
 const processForPageNotFound = function(req,res) {
   res.statusCode = 404;
   res.write("Page Not Found")
-}
+};
 
 const redirectToHomePage = function(req,res) {
   res.statusCode = 302;
   res.setHeader('location','/homePage.html');
   res.end()
-}
+};
+
+const redirectToToDo = function(req,res) {
+  res.statusCode = 302;
+  res.setHeader('location','/toDo.html');
+  res.end()
+};
 
 const fileServer = function(req,res) {
   let filename = "./public" + req.url;

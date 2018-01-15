@@ -8,11 +8,21 @@ const appendAllToDoTitlesToPage = function() {
     let li = document.createElement("li");
     let a = document.createElement('a');
     a.href = '/toDo.html';
-    a.appendChild(li);
-    li.innerText = toDoTitle;
-    ul.appendChild(a);
+    let button = document.createElement("button");
+    button.id = toDoTitle;
+    button.innerText = toDoTitle;
+    button.onclick = setTitleToCookie;
+    a.appendChild(button);
+    li.appendChild(a);
+    ul.appendChild(li);
   })
   listDiv.appendChild(ul);
+}
+
+
+const setTitleToCookie = function(event) {
+  let toDoTitle = event.target.id
+  document.cookie = `currentToDo = ${toDoTitle}`;
 }
 
 window.onload = appendAllToDoTitlesToPage;
