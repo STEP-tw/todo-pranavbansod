@@ -2,34 +2,18 @@ const fs = require('fs');
 const timeStamp = require('./time.js').timeStamp;
 const WebApp = require('./webapp');
 const registered_users = [{userName:'prateikp'}, {userName:'pranavb'}];
-const dataPath = './data/data.json';
-const dataToBeSentPath = './public/js/dataToBeSent.js';
+const ToDo = require('./lib/toDo.js');
+const User = require('./lib/user.js');
+const lib = require('./appLib.js');
+
 let data = {};
-
-let User = require('./lib/user.js');
 let pranavb = new User('pranavb');
-let pratikp = new User('pratikp');
 data['pranavb'] = pranavb;
-data['pratikp'] = pratikp;
+
+
 let app = WebApp.create();
-let ToDo = require('./lib/toDo.js');
 
 
-
-
-const getContentType = function(filename) {
-  let extension = filename.slice(filename.lastIndexOf('.'));
-  let contentType = {
-    '.html':'text/html',
-    '.jpg':'image/jpg',
-    '.css':'text/css',
-    '.js':'text/js',
-    '.gif':'image/gif',
-    '.pdf':'document/pdf',
-    '.ico':'image/ico'
-  }
-  return contentType[extension];
-};
 
 let toString = (obj)=>JSON.stringify(obj,null,2);
 
@@ -54,12 +38,12 @@ let loadUser = (req,res)=>{
 
 let redirectLoggedInUserToHome = (req,res)=>{
   if(req.urlIsOneOf(['/','/login.html']) && req.user) {
-    res.redirect('/homePage.html');
+    res.redirect('/homePage');
   }
 };
 
 let redirectLoggedOutUserToLogin = (req,res)=>{
-  let urlAllowedForOnlyLoggedIn = ['/', '/homePage.html', '/logout.html', '/toDo.html', '/item.html']
+  let urlAllowedForOnlyLoggedIn = ['/', '/homePage', '/logout.html', '/toDo', '/item.html']
   if(req.urlIsOneOf(urlAllowedForOnlyLoggedIn) && !req.user) {
     res.redirect('/login.html');
   }
@@ -94,29 +78,39 @@ app.get('/logout',(req,res)=>{
   res.end()
 });
 
-app.post('/homePage.html',(req,res)=>{
+app.post('/addToDo',(req,res)=>{
   let toDoTitle = req.body['toDoTitle'];
   let description = req.body['description'];
   let userName = req.user.userName;
   let user = data[`${userName}`];
   user.addToDo(toDoTitle,description);
-  let dataInString = JSON.stringify(data);
-  let dataToBeSent = 'let data = ' + dataInString;
-  fs.writeFileSync(dataToBeSentPath,dataToBeSent,'utf8');
-  fs.writeFileSync(dataPath,dataInString,'utf8');
   redirectToHomePage(req,res);
 });
 
-app.get('/toDo.html',(req,res)=>{
+app.post('/deleteToDo',(req,res)=>{
+  let userName = req.user.userName;
+  let user = data[`${userName}`];
+})
+
+app.get('/toDo',(req,res)=>{
   let toDo = fs.readFileSync('./public/toDo.html','utf-8');
-  toDo = toDo.replace('<toDoTitle></toDoTitle>',req.cookies.currentToDo);
+  let userName = req.user.userName;
+  let currentToDoTitle = req.cookies.currentToDo;
+  let userData = data[`${userName}`];
+  let currTodo = userData.getToDo(currentToDoTitle);
+  toDo = toDo.replace('<userName></userName>',userName);
+  toDo = toDo.replace('<toDoTitle></toDoTitle>',currentToDoTitle);
+  toDo = toDo.replace('<desc></desc>',currTodo.getDesc());
   res.write(toDo);
   res.end();
 })
 
-app.get('/homePage.html',(req,res)=>{
+app.get('/homePage',(req,res)=>{
   let homePage = fs.readFileSync('./public/homePage.html','utf8');
-  homePage = homePage.replace('<userName></userName>',req.user.userName);
+  let userName = req.user.userName;
+  homePage = homePage.replace('<userName></userName>',userName);
+  let userData = data[`${userName}`];
+  homePage = homePage.replace('<ToDoTitles>',userData.getToDoTitlesInHtmlList('/toDo'));
   res.write(homePage);
   res.end();
 });
@@ -124,7 +118,7 @@ app.get('/homePage.html',(req,res)=>{
 // ======================================================================
 
 const processForFileFound = function(req,res,filename) {
-  let contentType = getContentType(filename);
+  let contentType = lib.getContentType(filename);
   res.setHeader('Content-Type',contentType);
   res.statusCode = 200;
   res.write(fs.readFileSync(filename))
@@ -137,7 +131,7 @@ const processForPageNotFound = function(req,res) {
 
 const redirectToHomePage = function(req,res) {
   res.statusCode = 302;
-  res.setHeader('location','/homePage.html');
+  res.setHeader('location','/homePage');
   res.end()
 };
 

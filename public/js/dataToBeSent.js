@@ -1,1 +1,0 @@
-let data = {"pranavb":{"name":"pranavb","allToDo":{"Patel":{"title":"Patel","desc":"","items":{}},"Pranav":{"title":"Pranav","desc":"","items":{}}}},"pratikp":{"name":"pratikp","allToDo":{}}}
