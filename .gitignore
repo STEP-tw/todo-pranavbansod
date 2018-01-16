@@ -3,3 +3,4 @@ testFrameWork/
 data/
 *.log
 .DS_Store
+.nyc_output/

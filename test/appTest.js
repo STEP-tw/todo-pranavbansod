@@ -2,19 +2,97 @@ let chai = require('chai');
 let assert = chai.assert;
 let request = require('../testDep/requestSimulator.js');
 process.env.COMMENT_STORE = "./testStore.json";
+process.env.sessionid = '1234';
 let app = require('../app.js');
 let th = require('../testDep/testHelper.js');
 
 
 describe('login Page',()=>{
-  describe('GET /login.html',()=>{
+  describe('GET /login.html without cookies',()=>{
     it('serves login.html',done=>{
       request(app,{method:'GET',url:'/login.html'},res=>{
+        th.status_is_ok(res);
+        th.content_type_is(res,'text/html');
+        th.body_contains(res,'Login Form');
+        done();
+      })
+    })
+  })
+
+  describe('POST /login.html with valid userName',()=>{
+    it('should redirect to homePage',done=>{
+      let req = {method:'POST',url:'/login.html',body:'userName=pranavb'}
+      request(app,req,res=>{
+        th.should_be_redirected_to(res,'/homePage');
+        th.should_have_cookie(res,'sessionid','1234');
+        done();
+      })
+    })
+  })
+
+  describe('POST /login.html with invalid userName',()=>{
+    it('should redirect to homePage',done=>{
+      let req = {method:'POST',url:'/login.html',body:'userName=invalid'}
+      request(app,req,res=>{
+        th.status_is_ok(res);
+        th.content_type_is(res,'text/html');
+        th.body_contains(res,'Login Form');
+        th.should_not_have_cookie(res,'sessionid','1234');
+        done();
+      })
+    })
+  })
+
+  describe('GET /login.html with cookie as valid user',()=>{
+    let req = {method:'POST',url:'/login.html',body:'userName=pranavb'}
+    let sessionCookie = "";
+    it('it redirects to homePage',done=>{
+      request(app,req,res=>{
+        th.should_be_redirected_to(res,'/homePage')
+        sessionCookie = res.headers[`Set-Cookie`];
+        req['headers'] = {'cookie':`${sessionCookie}`};
+        req['method'] = 'GET';
+        done();
+      })
+    })
+    it('it redirects to homePage',done=>{
+      request(app,req,res=>{
+        th.should_be_redirected_to(res,'/homePage')
+        done();
+      })
+    })
+  })
+
+  describe('GET /login.html with cookie as invalid user',()=>{
+    let req = {method:'POST',url:'/login.html',body:'userName=pranavb'}
+    let sessionCookie = "";
+    it('it redirects to homePage',done=>{
+      request(app,req,res=>{
+        th.should_be_redirected_to(res,'/homePage')
+        sessionCookie = res.headers[`Set-Cookie`];
+        req['headers'] = {'cookie':`1`};
+        req['method'] = 'GET';
+        done();
+      })
+    })
+    it('it redirects to homePage',done=>{
+      request(app,req,res=>{
         th.status_is_ok(res);
         th.content_type_is(res,'text/html');
         th.body_contains(res,'Login Form')
         done();
       })
+    })
+  })
+})
+
+
+describe('GET /logout',()=>{
+  it('should redirect to Login',done=>{
+    let req = {method:'POST',url:'/logout.html'};
+    request(app,req,res=>{
+      th.should_be_redirected_to(res,'/login.html')
+      done();
     })
   })
 })
