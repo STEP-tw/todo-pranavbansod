@@ -5,8 +5,6 @@ let app = WebApp.create();
 
 
 
-let toString = (obj)=>JSON.stringify(obj,null,2);
-
 app.addPreProcessor(lib.logRequest);
 app.addPreProcessor(lib.loadUser);
 app.addPreProcessor(lib.redirectLoggedInUserToHome);
@@ -26,6 +24,8 @@ app.post('/deleteToDo',lib.deleteToDo);
 app.get('/toDo',lib.getToDoHandler);
 
 app.get('/homePage',lib.getHomePageHandler);
+
+app.get('/deleteToDo',lib.deleteToDoAndRedirectToHome)
 
 // ======================================================================
 

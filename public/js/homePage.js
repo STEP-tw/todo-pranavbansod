@@ -1,6 +1,5 @@
 const setTitleToCookie = function(event) {
   let toDoTitle = event.target.id;
-  alert("Patel")
   document.cookie = `currentToDo = ${toDoTitle}`;
 }
 

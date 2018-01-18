@@ -9,6 +9,7 @@ let data = {};
 let pranavb = new User('pranavb');
 data['pranavb'] = pranavb;
 
+let toString = (obj)=>JSON.stringify(obj,null,2);
 
 const logRequest = (req,res)=>{
   let text = ['------------------------------',
@@ -38,7 +39,7 @@ const redirectLoggedInUserToHome = (req,res)=>{
 };
 
 const redirectLoggedOutUserToLogin = (req,res)=>{
-  let urlAllowedForOnlyLoggedIn = ['/', '/homePage', '/logout.html', '/toDo', '/item.html']
+  let urlAllowedForOnlyLoggedIn = ['/', '/homePage', '/logout.html', '/toDo', '/item.html','/deleteToDo'];
   if(req.urlIsOneOf(urlAllowedForOnlyLoggedIn) && !req.user) {
     res.redirect('/login.html');
   }
@@ -92,7 +93,7 @@ const deleteToDo = (req,res)=>{
 };
 
 const getToDoHandler = (req,res)=>{
-  let toDo = fs.readFileSync('./public/toDo.html','utf-8');
+  let toDo = fs.readFileSync('./public/toDo.html','utf8');
   let userName = req.user.userName;
   let currentToDoTitle = req.cookies.currentToDo;
   let userData = data[`${userName}`];
@@ -100,6 +101,7 @@ const getToDoHandler = (req,res)=>{
   toDo = toDo.replace('<userName></userName>',userName);
   toDo = toDo.replace('<toDoTitle></toDoTitle>',currentToDoTitle);
   toDo = toDo.replace('<desc></desc>',currTodo.getDesc());
+  res.setHeader('Content-Type','text/html');
   res.write(toDo);
   res.end();
 };
@@ -113,6 +115,13 @@ const getHomePageHandler = (req,res)=>{
   res.write(homePage);
   res.end();
 }
+
+const deleteToDoAndRedirectToHome = (req,res)=>{
+  let userName = req.user.userName;
+  let userData = data[`${userName}`];
+  userData.deleteToDo(`${req.cookies.currentToDo}`)
+  redirectToHomePage(req,res);
+}
 //=================================================================
 
 
@@ -125,5 +134,7 @@ module.exports = {
   logoutUser,
   addToDoAndRedirectToHome,
   deleteToDo,
-  getHomePageHandler
+  getHomePageHandler,
+  getToDoHandler,
+  deleteToDoAndRedirectToHome
 }

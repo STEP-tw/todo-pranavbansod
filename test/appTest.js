@@ -66,7 +66,7 @@ describe('login Page',()=>{
   describe('GET /login.html with cookie as invalid user',()=>{
     let req = {method:'POST',url:'/login.html',body:'userName=pranavb'}
     let sessionCookie = "";
-    it('it redirects to homePage',done=>{
+    it('req with correct userName the res will have sessionid',done=>{
       request(app,req,res=>{
         th.should_be_redirected_to(res,'/homePage')
         sessionCookie = res.headers[`Set-Cookie`];
@@ -86,28 +86,56 @@ describe('login Page',()=>{
   })
 })
 
-
-describe('GET /logout',()=>{
-  it('should redirect to Login',done=>{
-    let req = {method:'POST',url:'/logout.html'};
-    request(app,req,res=>{
-      th.should_be_redirected_to(res,'/login.html')
-      done();
+describe('/logout request',()=>{
+  describe('GET /logout',()=>{
+    it('should redirect to Login',done=>{
+      let req = {method:'POST',url:'/logout.html'};
+      request(app,req,res=>{
+        th.should_be_redirected_to(res,'/login.html')
+        done();
+      })
     })
   })
 })
 
-
-describe('app without Login',()=>{
-  describe('GET /bad',()=>{
-    it('responds with 404',(done)=>{
-      request(app,{method:'GET',url:'/bad'},(res)=>{
-        assert.equal(res.statusCode,404);
+describe('/  : No filePath',()=>{
+  describe('GET / with Cookie',()=>{
+    it('should redirect to login page',(done)=>{
+      let req = {method:'GET',url:'/'};
+      request(app,req,res=>{
+        th.should_be_redirected_to(res,'/login.html')
         done();
       })
     })
   })
 
+  describe('GET / with Cookie',()=>{
+    let req = {method:'POST',url:'/login.html',body:'userName=pranavb'}
+    let sessionCookie = "";
+    it('it should ',done=>{
+      request(app,req,res=>{
+        th.should_be_redirected_to(res,'/homePage')
+        sessionCookie = res.headers[`Set-Cookie`];
+        req['headers'] = {'cookie':`${sessionCookie}`};
+        req['method'] = 'GET';
+        done();
+      })
+    })
+
+  })
+})
+
+
+describe('GET /bad',()=>{
+  it('responds with 404',(done)=>{
+    request(app,{method:'GET',url:'/bad'},(res)=>{
+      assert.equal(res.statusCode,404);
+      done();
+    })
+  })
+})
+
+describe('app without Login',()=>{
   describe('GET /',()=>{
     it('redirects to login.html',done=>{
       request(app,{method:'GET',url:'/'},(res)=>{
