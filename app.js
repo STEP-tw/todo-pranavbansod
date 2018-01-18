@@ -17,17 +17,20 @@ app.post('/login.html',lib.postLoginHandler);
 
 app.post('/addToDo',lib.addToDoAndRedirectToHome);
 
-app.post('/deleteToDo',lib.deleteToDo);
+// app.post('/deleteToDo',lib.deleteToDo);
 
 app.post('/addItem',lib.addItemAndRedirectToToDo)
 
-app.get('/logout',lib.logoutUser);
+app.get('/homePage',lib.getHomePageHandler);
+
+app.get('/deleteToDo',lib.deleteToDoAndRedirectToHome);
 
 app.get('/toDo',lib.getToDoHandler);
 
-app.get('/homePage',lib.getHomePageHandler);
+app.post('/deleteItem',lib.deleteItemAndGetUpdatedList);
 
-app.get('/deleteToDo',lib.deleteToDoAndRedirectToHome)
+app.get('/logout',lib.logoutUser);
+
 
 // ======================================================================
 

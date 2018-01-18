@@ -96,10 +96,10 @@ const addItemAndRedirectToToDo = (req,res)=>{
   redirectToToDo(req,res);
 };
 
-const deleteToDo = (req,res)=>{
-  let userName = req.user.userName;
-  let user = data[`${userName}`];
-};
+// const deleteToDo = (req,res)=>{
+//   let userName = req.user.userName;
+//   let user = data[`${userName}`];
+// };
 
 const getToDoHandler = (req,res)=>{
   let toDo = fs.readFileSync('./public/toDo.html','utf8');
@@ -132,6 +132,17 @@ const deleteToDoAndRedirectToHome = (req,res)=>{
   userData.deleteToDo(`${req.cookies.currentToDo}`)
   redirectToHomePage(req,res);
 }
+
+const deleteItemAndGetUpdatedList = (req,res)=>{
+  let userName = req.user.userName;
+  let currentToDo = req.cookies.currentToDo;
+  let userData = data[`${userName}`];
+  userData.deleteItemOf(currentToDo,req.body['item']);
+  currTodo = userData.getToDo(currentToDo);
+  updatedItemList = currTodo.getAllItemsDesc();
+  res.write(JSON.stringify(updatedItemList));
+  res.end();
+};
 //=================================================================
 
 
@@ -143,9 +154,9 @@ module.exports = {
   redirectLoggedOutUserToLogin,
   logoutUser,
   addToDoAndRedirectToHome,
-  deleteToDo,
   getHomePageHandler,
   getToDoHandler,
   deleteToDoAndRedirectToHome,
-  addItemAndRedirectToToDo
+  addItemAndRedirectToToDo,
+  deleteItemAndGetUpdatedList
 }
