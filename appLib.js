@@ -53,7 +53,7 @@ const redirectToHomePage = function(req,res) {
 
 const redirectToToDo = function(req,res) {
   res.statusCode = 302;
-  res.setHeader('location','/toDo.html');
+  res.setHeader('location','/toDo');
   res.end()
 };
 
@@ -87,6 +87,15 @@ const addToDoAndRedirectToHome = (req,res)=>{
   redirectToHomePage(req,res);
 };
 
+const addItemAndRedirectToToDo = (req,res)=>{
+  let itemDesc = req.body['newItemDesc'];
+  let currTodo = req.cookies.currentToDo;
+  let userName = req.user.userName;
+  let user = data[`${userName}`];
+  user.addItemTo(currTodo,itemDesc);
+  redirectToToDo(req,res);
+};
+
 const deleteToDo = (req,res)=>{
   let userName = req.user.userName;
   let user = data[`${userName}`];
@@ -101,6 +110,7 @@ const getToDoHandler = (req,res)=>{
   toDo = toDo.replace('<userName></userName>',userName);
   toDo = toDo.replace('<toDoTitle></toDoTitle>',currentToDoTitle);
   toDo = toDo.replace('<desc></desc>',currTodo.getDesc());
+  toDo = toDo.replace('<allItems></allItems>',currTodo.getAllItemsInHtmlList());
   res.setHeader('Content-Type','text/html');
   res.write(toDo);
   res.end();
@@ -136,5 +146,6 @@ module.exports = {
   deleteToDo,
   getHomePageHandler,
   getToDoHandler,
-  deleteToDoAndRedirectToHome
+  deleteToDoAndRedirectToHome,
+  addItemAndRedirectToToDo
 }

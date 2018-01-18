@@ -15,11 +15,13 @@ app.addPreProcessor(lib.redirectLoggedOutUserToLogin);
 
 app.post('/login.html',lib.postLoginHandler);
 
-app.get('/logout',lib.logoutUser);
-
 app.post('/addToDo',lib.addToDoAndRedirectToHome);
 
 app.post('/deleteToDo',lib.deleteToDo);
+
+app.post('/addItem',lib.addItemAndRedirectToToDo)
+
+app.get('/logout',lib.logoutUser);
 
 app.get('/toDo',lib.getToDoHandler);
 

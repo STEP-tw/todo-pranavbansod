@@ -8,30 +8,33 @@
     <div id="userName">
       <h2><userName></userName></h2>
     </div>
-    <h3>ToDo Title  :  </h3>
+    <h3>Title  :  </h3>
     <div id="toDoTitle">
       <h3><toDoTitle></toDoTitle></h3>
     </div>
-    <p align="right">
-      <a href="/deleteToDo">Delete ToDo</a>
-    </p>
-    <h4>
-      ToDo Description : 
-      <div id="toDoDesc"><desc></desc></div>
-    </h4>
-    <div id="toDo">
-
-    </div>
-    <br><br><br><br>
     <form method="post">
       New Title : <input type="text" name="newTitle" value="" required>
       <input type="submit" name="" value="Edit Title"></input>
     </form>
+    <p align="right">
+      <a href="/deleteToDo">Delete ToDo</a>
+    </p>
+    <h4>
+      Description :
+      <div id="toDoDesc"><desc></desc></div>
+    </h4>
     <form method="post">
       Description : <input type="text" name="newToDoDesc" value="" required>
       <input type="submit" name="" value="Edit Description"></input>
     </form>
-    <form method="post">
+    <h4>Items : </h4>
+    <p>
+      <div id="items">
+        <allItems></allItems>
+      </div>
+    </p>
+    <br><br>
+    <form action="/addItem" method="post">
       Item : <input type="text" name="newItemDesc" value="" required>
       <input type="submit" name="" value="Add Item"></input>
     </form>

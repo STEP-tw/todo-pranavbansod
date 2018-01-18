@@ -111,4 +111,13 @@ describe('ToDo Module',()=>{
       assert.deepEqual(todo.getItems(),allItems)
     })
   })
+
+  describe('getAllItemsDesc',()=>{
+    it('should return all items desc in a list',()=>{
+      let todo = new ToDo('My ToDo');
+      todo.addItem('Item 1');
+      todo.addItem('Item 2');
+      assert.deepEqual(todo.getAllItemsDesc(),['Item 1','Item 2']);
+    })
+  })
 })
